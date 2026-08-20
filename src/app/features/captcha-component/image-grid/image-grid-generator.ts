@@ -8,14 +8,10 @@ const ANIMAL_SPECIES = {
 };
 
 export interface ImageGridContent {
+  type: 'image-grid';
   targetLabel: Species;
-  images: {
-    id: string;
-    src: string;
-    isTarget: boolean;
-  }[];
+  images: { id: string; src: string; isTarget: boolean }[];
 }
-
 
 const buildSrcPath = (species: Species, num: number) => `/images/${species}/${species}-${num}.jpg`;
 
@@ -24,6 +20,7 @@ export function generateImageGridContent(): ImageGridContent {
   const targetLabel = VALID_SPECIES[randomSpecies];
 
   const imageGridContent: ImageGridContent = {
+    type: 'image-grid',
     targetLabel,
     images: [],
   };

@@ -1,0 +1,14 @@
+<fieldset class="image-grid">
+  <legend>Select all {{ imageGridContent.targetLabel }}</legend>
+
+  @for (image of imageGridContent.images; track image.id) {
+    <label class="image-cell">
+      <input
+        type="checkbox"
+        [checked]="selectedIds().has(image.id)"
+        (change)="toggleSelection(image.id)"
+      />
+      <img [src]="image.src" alt="" />
+    </label>
+  }
+</fieldset>

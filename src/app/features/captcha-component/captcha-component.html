@@ -1,1 +1,14 @@
 <p>captcha-component works!</p>
+<app-image-grid />
+
+@if (showError()) {
+<p class="error" role="alert">That's not quite right — try again.</p>
+}
+<div class="contols">
+  @if (captchaState.currentStageIndex() > 0) {
+  <button (click)="onPrevious()">Previous</button>
+  }
+
+  <button (click)="onNext()">{{isLastChallenge() ? "Result" : "Next"}}</button>
+
+</div>
