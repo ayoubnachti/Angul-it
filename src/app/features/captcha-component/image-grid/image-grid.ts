@@ -1,24 +1,20 @@
-import { Component, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { generateImageGridContent, ImageGridContent } from './image-grid-generator';
-import { CaptchaChallenge } from '../captcha-challenge';
 
 @Component({
   selector: 'app-image-grid',
-  imports: [MatButtonToggleModule, FormsModule, ReactiveFormsModule],
+  imports: [],
   templateUrl: './image-grid.html',
   styleUrl: './image-grid.css',
-  providers: [{ provide: CaptchaChallenge, useExisting: ImageGrid }],
 })
-export class ImageGrid extends CaptchaChallenge {
-  selectedIds = signal<Set<string>>(new Set());
-  imageGridContent!: ImageGridContent;
+export class ImageGrid {
+  existingContent = input<ImageGridContent>();
+  result = output<{ passed: boolean; content: ImageGridContent }>();
 
-  init(existingContent?: ImageGridContent) {
-    this.imageGridContent = existingContent ?? generateImageGridContent();
-    return this.imageGridContent;
-  }
+  imageGridContent = computed(() => this.existingContent() ?? generateImageGridContent());
+  selectedIds = signal<Set<string>>(new Set());
+
+  isReadonly = computed(() => !!this.existingContent());
 
   toggleSelection(id: string) {
     const next = new Set(this.selectedIds());
@@ -26,12 +22,12 @@ export class ImageGrid extends CaptchaChallenge {
     this.selectedIds.set(next);
   }
 
-  validate(): boolean {
-    let targetIds = new Set(
-      this.imageGridContent.images.filter((image) => image.isTarget).map((image) => image.id)
-    );
-    const setsAreEqual = (setA: any, setB: any) => setA.size === setB.size && setA.isSubsetOf(setB);
-    const isValid: boolean = setsAreEqual(targetIds, this.selectedIds());
-    return isValid;
+  onSubmit() {
+    const content = this.imageGridContent();
+    const targetIds = new Set(content.images.filter((i) => i.isTarget).map((i) => i.id));
+    const setsAreEqual = (a: any, b: any) => a.size === b.size && a.isSubsetOf(b);
+    const passed = setsAreEqual(targetIds, this.selectedIds());
+
+    this.result.emit({ passed, content });
   }
 }

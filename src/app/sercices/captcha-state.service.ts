@@ -16,6 +16,10 @@ export class CaptchaStateService {
     () => this.stages().length > 0 && !this.stages().some((stage) => stage.status != 'passed')
   );
 
+  initStages(count: number) {
+    this.stages.set(Array.from({ length: count }, () => ({ status: 'pending' as const })));
+  }
+
   setStageContent(index: number, content: StageContent): void {
     this.stages.update((stages) =>
       stages.map((stage, i) => (i === index ? { ...stage, content } : stage))
