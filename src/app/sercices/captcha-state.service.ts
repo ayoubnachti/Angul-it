@@ -1,8 +1,9 @@
 import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { StageContent } from '../features/captcha-component/stage-content.types';
 
 export interface StageState {
   status: 'pending' | 'passed';
-  content?: unknown;
+  content?: StageContent;
 }
 
 @Injectable({
@@ -14,6 +15,16 @@ export class CaptchaStateService {
   isComplete: Signal<boolean> = computed(
     () => this.stages().length > 0 && !this.stages().some((stage) => stage.status != 'passed')
   );
+
+  initStages(count: number) {
+    this.stages.set(Array.from({ length: count }, () => ({ status: 'pending' as const })));
+  }
+
+  setStageContent(index: number, content: StageContent): void {
+    this.stages.update((stages) =>
+      stages.map((stage, i) => (i === index ? { ...stage, content } : stage))
+    );
+  }
 
   public markPassed() {
     this.stages.update((currentStagesValue) =>

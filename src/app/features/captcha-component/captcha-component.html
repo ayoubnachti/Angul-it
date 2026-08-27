@@ -1,1 +1,16 @@
-<p>captcha-component works!</p>
+@if (captchaState.currentStageIndex() > 0) {
+  <button (click)="onPrevious()">Previous</button>
+}
+
+@if (currentStageStatus() === 'passed') {
+  <button (click)="captchaState.advance()">Next</button>
+}
+
+<app-image-grid
+  [existingContent]="currentStageContent()"
+  (result)="onChallengeResult($event)"
+/>
+
+@if (showError()) {
+  <p class="error" role="alert">That's not quite right — try again.</p>
+}
