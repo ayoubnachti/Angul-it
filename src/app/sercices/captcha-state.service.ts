@@ -2,6 +2,7 @@ import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/c
 import { StageContent } from '../features/captcha-component/stage-content.types';
 
 export interface StageState {
+  type: StageContent['type'];
   status: 'pending' | 'passed';
   content?: StageContent;
 }
@@ -16,8 +17,10 @@ export class CaptchaStateService {
     () => this.stages().length > 0 && !this.stages().some((stage) => stage.status != 'passed')
   );
 
-  initStages(count: number) {
-    this.stages.set(Array.from({ length: count }, () => ({ status: 'pending' as const })));
+  initStages(types: StageContent['type'][]) {
+    this.stages.set(
+      types.map(type => ({type, status: "pending"})) 
+    );
   }
 
   setStageContent(index: number, content: StageContent): void {

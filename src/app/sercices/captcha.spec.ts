@@ -9,9 +9,9 @@ describe('captchaStateService', () => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(CaptchaStateService);
     service.stages.set([
-      { status: 'pending' },
-      { status: 'pending' },
-      { status: 'pending' },
+      {type:"image-grid", status: 'pending' },
+      {type:"text-repeat", status: 'pending' },
+      {type:"image-grid", status: 'pending' },
     ]);
   });
 

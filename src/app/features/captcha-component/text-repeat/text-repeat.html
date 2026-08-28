@@ -1,0 +1,14 @@
+<p>Try to retype this:</p>
+<p class="text-to-repeat">{{ textRepeatContent().challengeText }}</p>
+
+<label for="repeat-input">Your answer</label>
+<input
+  id="repeat-input"
+  type="text"
+  [disabled]="isReadOnly()"
+  (input)="onTyping($event)"
+/>
+
+@if (!isReadOnly()) {
+  <button (click)="onSubmit()">Submit</button>
+}
