@@ -1,5 +1,7 @@
-import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, effect, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { StageContent } from '../features/captcha-component/stage-content.types';
+
+const STORAGE_KEY = 'angul-it-captcha-progress';
 
 export interface StageState {
   type: StageContent['type'];
@@ -7,9 +9,12 @@ export interface StageState {
   content?: StageContent;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+interface PersistedProgress {
+  stages: StageState[];
+  currentStageIndex: number;
+}
+
+@Injectable({ providedIn: 'root' })
 export class CaptchaStateService {
   stages: WritableSignal<StageState[]> = signal([]);
   currentStageIndex: WritableSignal<number> = signal(0);
@@ -17,10 +22,38 @@ export class CaptchaStateService {
     () => this.stages().length > 0 && !this.stages().some((stage) => stage.status != 'passed')
   );
 
+  constructor() {
+    this.restoreFromStorage();
+
+    effect(() => {
+      const progress: PersistedProgress = {
+        stages: this.stages(),
+        currentStageIndex: this.currentStageIndex(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    });
+  }
+
+  hasStoredProgress(): boolean {
+    return this.stages().length > 0;
+  }
+
+  private restoreFromStorage() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+
+    try {
+      const parsed: PersistedProgress = JSON.parse(raw);
+      this.stages.set(parsed.stages);
+      this.currentStageIndex.set(parsed.currentStageIndex);
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }
+
   initStages(types: StageContent['type'][]) {
-    this.stages.set(
-      types.map(type => ({type, status: "pending"})) 
-    );
+    this.stages.set(types.map((type) => ({ type, status: 'pending' as const })));
+    this.currentStageIndex.set(0);
   }
 
   setStageContent(index: number, content: StageContent): void {

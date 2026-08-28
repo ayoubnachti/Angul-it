@@ -16,8 +16,10 @@ export class CaptchaComponent {
   showError = signal(false);
 
   constructor() {
+  if (!this.captchaState.hasStoredProgress()) {
     this.captchaState.initStages(['image-grid', 'text-repeat', 'arithmetic']);
   }
+}
 
   currentStageContent = computed(() => this.getCurrentStage()?.content);
   currentStageStatus = computed(() => this.getCurrentStage()?.status);

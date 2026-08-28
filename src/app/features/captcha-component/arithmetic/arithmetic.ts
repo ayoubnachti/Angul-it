@@ -12,18 +12,18 @@ export class Arithmetic {
   result = output<{ passed: boolean; content: ArithmeticContent }>();
 
   arithmeticContent = computed(() => this.existingContent() ?? generateArithmeticContent());
-  userAnswear = signal<number>(0);
+  userAnswer = signal<number>(0);
 
   isReadOnly = computed(() => !!this.existingContent());
 
   onInput(e: Event) {
     const input = e.target as HTMLInputElement;
-    this.userAnswear.set(+input.value);
+    this.userAnswer.set(+input.value);
   }
 
   onSubmit() {
     const content = this.arithmeticContent();
-    const passed = this.userAnswear() === content.answer;
+    const passed = this.userAnswer() === content.answer;
     this.result.emit({ passed, content });
   }
 }
