@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ImageGrid } from './image-grid/image-grid';
-import { CaptchaStateService } from '../../services/captcha-state.service';
-import { StageContent } from './stage-content.types';
 import { TextRepeat } from './text-repeat/text-repeat';
 import { Arithmetic } from './arithmetic/arithmetic';
+import { CaptchaStateService } from '../../services/captcha-state.service';
+import { StageContent } from './stage-content.types';
 
 @Component({
   selector: 'app-captcha-component',
@@ -13,13 +14,20 @@ import { Arithmetic } from './arithmetic/arithmetic';
 })
 export class CaptchaComponent {
   captchaState = inject(CaptchaStateService);
+  private router = inject(Router);
   showError = signal(false);
 
   constructor() {
-  if (!this.captchaState.hasStoredProgress()) {
-    this.captchaState.initStages(['image-grid', 'text-repeat', 'arithmetic']);
+    if (!this.captchaState.hasStoredProgress()) {
+      this.captchaState.initStages(['image-grid', 'text-repeat', 'arithmetic']);
+    }
+
+    effect(() => {
+      if (this.captchaState.isComplete()) {
+        this.router.navigate(['/result']);
+      }
+    });
   }
-}
 
   currentStageContent = computed(() => this.getCurrentStage()?.content);
   currentStageStatus = computed(() => this.getCurrentStage()?.status);
@@ -35,11 +43,10 @@ export class CaptchaComponent {
     return content?.type === 'text-repeat' ? content : undefined;
   });
 
-  currentArithmethicContent = computed(() => {
+  currentArithmeticContent = computed(() => {
     const content = this.currentStageContent();
     return content?.type === 'arithmetic' ? content : undefined;
   });
-
 
   onPrevious() {
     this.captchaState.goToPrevious();
@@ -47,10 +54,18 @@ export class CaptchaComponent {
 
   onChallengeResult(event: { passed: boolean; content: StageContent }) {
     this.showError.set(!event.passed);
-    if (event.passed) {
-      this.captchaState.setStageContent(this.captchaState.currentStageIndex(), event.content);
-      this.captchaState.markPassed();
+
+    if (!event.passed) {
+      this.captchaState.recordAttempt();
+      return;
     }
+
+    this.captchaState.setStageContent(this.captchaState.currentStageIndex(), event.content);
+    this.captchaState.markPassed();
+  }
+
+  isLastChallenge(): boolean {
+    return this.captchaState.currentStageIndex() == this.captchaState.stages().length - 1;
   }
 
   private getCurrentStage() {
