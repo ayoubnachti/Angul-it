@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal, ViewChild } from '@angular/core';
 import { ImageGrid } from './image-grid/image-grid';
-import { CaptchaStateService } from '../../sercices/captcha-state.service';
+import { CaptchaStateService } from '../../services/captcha-state.service';
 import { StageContent } from './stage-content.types';
 import { TextRepeat } from './text-repeat/text-repeat';
 
