@@ -1,0 +1,31 @@
+.arithmetic-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: monospace;
+  margin: 16px 0;
+}
+
+.arithmetic-inline input {
+  width: 4ch;
+  font-size: 1.5rem;
+  font-family: monospace;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  border-bottom: 2px solid #999;
+  background: transparent;
+  padding: 2px 4px;
+}
+
+.arithmetic-inline input:focus {
+  outline: none;
+  border-bottom-color: #3b82f6;
+}
+
+.arithmetic-inline input:disabled {
+  border-bottom-color: #ccc;
+  color: #666;
+}

@@ -1,0 +1,21 @@
+<p>Can you solve this:</p>
+
+<label for="repeat-input">Your answer</label>
+
+<div class="arithmetic-inline">
+  <span>{{ arithmeticContent().operandA }}</span>
+  <span>{{ arithmeticContent().operator }}</span>
+  <span>{{ arithmeticContent().operandB }}</span>
+  <span>=</span>
+  <input
+    type="number"
+    aria-label="Your answer"
+    [disabled]="isReadOnly()"
+    (input)="onInput($event)"
+    [value]="isReadOnly() ? arithmeticContent().answer : userAnswer()"
+  />
+</div>
+
+@if (!isReadOnly()) {
+  <button (click)="onSubmit()">Submit</button>
+}

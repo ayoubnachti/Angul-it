@@ -5,7 +5,7 @@
     <label class="image-cell">
       <input
         type="checkbox"
-        [checked]="selectedIds().has(image.id)"
+        [checked]="isReadonly() ? image.isTarget : selectedIds().has(image.id)"
         [disabled]="isReadonly()"
         (change)="toggleSelection(image.id)"
       />

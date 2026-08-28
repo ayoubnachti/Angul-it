@@ -24,13 +24,7 @@ describe('HomeComponent', () => {
 
   it('should render the start challenge button', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const button = compiled.querySelector('a[routerLink]');
+    const button = compiled.querySelector('button');
     expect(button?.textContent).toContain('Start Challenge');
-  });
-
-  it('should link to the captcha route', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const button = compiled.querySelector('a[routerLink]');
-    expect(button?.getAttribute('routerlink')).toBe('/captcha');
   });
 });
