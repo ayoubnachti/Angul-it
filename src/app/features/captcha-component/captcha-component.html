@@ -6,10 +6,20 @@
   <button (click)="captchaState.advance()">Next</button>
 }
 
-<app-image-grid
-  [existingContent]="currentStageContent()"
-  (result)="onChallengeResult($event)"
-/>
+@switch (currentStageType()) {
+  @case ('image-grid') {
+    <app-image-grid
+      [existingContent]="currentImageGridContent()"
+      (result)="onChallengeResult($event)"
+    />
+  }
+  @case ('text-repeat') {
+    <app-text-repeat
+      [existingContent]="currentTextRepeatContent()"
+      (result)="onChallengeResult($event)"
+    />
+  }
+}
 
 @if (showError()) {
   <p class="error" role="alert">That's not quite right — try again.</p>
