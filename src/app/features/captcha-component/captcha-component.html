@@ -19,6 +19,12 @@
       (result)="onChallengeResult($event)"
     />
   }
+  @case ('arithmetic') {
+    <app-arithmetic
+      [existingContent]="currentArithmethicContent()"
+      (result)="onChallengeResult($event)"
+    />
+  }
 }
 
 @if (showError()) {

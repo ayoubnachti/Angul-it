@@ -3,10 +3,11 @@ import { ImageGrid } from './image-grid/image-grid';
 import { CaptchaStateService } from '../../services/captcha-state.service';
 import { StageContent } from './stage-content.types';
 import { TextRepeat } from './text-repeat/text-repeat';
+import { Arithmetic } from './arithmetic/arithmetic';
 
 @Component({
   selector: 'app-captcha-component',
-  imports: [ImageGrid, TextRepeat],
+  imports: [ImageGrid, TextRepeat, Arithmetic],
   templateUrl: './captcha-component.html',
   styleUrl: './captcha-component.css',
 })
@@ -15,7 +16,7 @@ export class CaptchaComponent {
   showError = signal(false);
 
   constructor() {
-    this.captchaState.initStages(['image-grid', 'text-repeat', 'image-grid']);
+    this.captchaState.initStages(['image-grid', 'text-repeat', 'arithmetic']);
   }
 
   currentStageContent = computed(() => this.getCurrentStage()?.content);
@@ -31,6 +32,12 @@ export class CaptchaComponent {
     const content = this.currentStageContent();
     return content?.type === 'text-repeat' ? content : undefined;
   });
+
+  currentArithmethicContent = computed(() => {
+    const content = this.currentStageContent();
+    return content?.type === 'arithmetic' ? content : undefined;
+  });
+
 
   onPrevious() {
     this.captchaState.goToPrevious();
