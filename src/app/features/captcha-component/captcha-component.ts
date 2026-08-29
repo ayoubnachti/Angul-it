@@ -21,6 +21,8 @@ export class CaptchaComponent {
     if (!this.captchaState.hasStoredProgress()) {
       this.captchaState.initStages(['image-grid', 'text-repeat', 'arithmetic']);
     }
+    
+    this.captchaState.startSessionTimer();
 
     effect(() => {
       if (this.captchaState.isComplete()) {
