@@ -1,59 +1,90 @@
-# AngulIt
+# Angul-It
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+A multi-stage CAPTCHA verification app built in Angular, as a hands-on
+exercise in Angular fundamentals.
 
-## Development server
+## Overview
 
-To start a local development server, run:
+Angul-It challenges the user with three verification stages before
+granting access:
+
+1. **Image Grid** — select all images matching a randomly chosen animal
+   species (cat, dog, or bird) from a 3×3 grid.
+2. **Text Repeat** — retype an 8-character, case-sensitive random string
+   (letters, digits, and special characters).
+3. **Arithmetic** — solve a randomly generated arithmetic problem
+   (addition, subtraction, or multiplication).
+
+Progress persists across page refreshes. On completion, a results page
+shows total attempts and time spent, with an option to restart.
+
+## Getting started
+
+### Prerequisites
+
+- Node.js (LTS recommended)
+- Angular CLI
+
+### Install
+
+```bash
+npm install
+```
+
+### Run locally
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Navigate to `http://localhost:4200/`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Run tests
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+Tests run via Vitest (the Angular CLI's default test runner as of this
+project's Angular version).
 
-For end-to-end (e2e) testing, run:
+### Build
 
 ```bash
-ng e2e
+ng build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Output is written to `dist/`.
 
-## Additional Resources
+## Architecture notes
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **State management**: a single `CaptchaStateService` (signals-based)
+  holds all stage state — status, type, content, attempt count, and
+  session timing. See `01-decisions/0001-*.md` for the reasoning behind
+  choosing services + signals over NgRx or plain localStorage.
+- **Challenge components** are self-contained: each generates its own
+  content (or reuses restored content via an `existingContent` input),
+  validates its own answer, and emits a `{ passed, content }` result.
+  `CaptchaComponent` owns orchestration — routing, error display,
+  storing content on a pass, and advancing stages — but has no
+  knowledge of any challenge's internal validation logic.
+- **Persistence**: progress (stages, current index, attempts, session
+  timestamps) is written to `localStorage` on every change via a single
+  `effect()`, and restored on `CaptchaStateService` construction.
+- **Routing guards**: `/result` is only reachable once all stages are
+  passed; the home route redirects back into an in-progress session
+  rather than allowing a restart-by-accident.
+
+## Known limitations
+
+- **No multi-tab sync**: state is held in-memory per browser tab, with
+  `localStorage` as the persistence layer. Two tabs of the same session
+  can diverge, and the last tab to write wins. This app is designed for
+  single-tab use.
+
+## Tech stack
+
+- Angular 21.1, standalone components
+- Vitest for testing
+- CSS custom properties for theming (no CSS framework)
+- GitHub Actions CI (`ng test` + `ng build` on push)
