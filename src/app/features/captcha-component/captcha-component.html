@@ -1,32 +1,27 @@
-@if (captchaState.currentStageIndex() > 0) {
+<div class="controls">
+  @if (captchaState.currentStageIndex() > 0) {
   <button (click)="onPrevious()">Previous</button>
-}
+  }
+  @if (currentStageStatus() === 'passed') {
+  <button class="align-right" (click)="captchaState.advance()">Next</button>
+  }
+</div>
 
-@if (currentStageStatus() === 'passed') {
-  <button (click)="captchaState.advance()">Next</button>
-}
 
-@switch (currentStageType()) {
+<div class="challenge-container">
+  @switch (currentStageType()) {
   @case ('image-grid') {
-    <app-image-grid
-      [existingContent]="currentImageGridContent()"
-      (result)="onChallengeResult($event)"
-    />
+  <app-image-grid [existingContent]="currentImageGridContent()" (result)="onChallengeResult($event)" />
   }
   @case ('text-repeat') {
-    <app-text-repeat
-      [existingContent]="currentTextRepeatContent()"
-      (result)="onChallengeResult($event)"
-    />
+  <app-text-repeat [existingContent]="currentTextRepeatContent()" (result)="onChallengeResult($event)" />
   }
   @case ('arithmetic') {
-    <app-arithmetic
-      [existingContent]="currentArithmeticContent()"
-      (result)="onChallengeResult($event)"
-    />
+  <app-arithmetic [existingContent]="currentArithmeticContent()" (result)="onChallengeResult($event)" />
   }
-}
+  }
+</div>
 
 @if (showError()) {
-  <p class="error" role="alert">That's not quite right — try again.</p>
+<p class="error" role="alert">That's not quite right — try again.</p>
 }

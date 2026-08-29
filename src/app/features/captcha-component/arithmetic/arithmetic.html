@@ -1,6 +1,6 @@
 <p>Can you solve this:</p>
 
-<label for="repeat-input">Your answer</label>
+<label>Your answer: </label>
 
 <div class="arithmetic-inline">
   <span>{{ arithmeticContent().operandA }}</span>
@@ -17,5 +17,5 @@
 </div>
 
 @if (!isReadOnly()) {
-  <button (click)="onSubmit()">Submit</button>
+  <button class="btn-submit" (click)="onSubmit()">Submit</button>
 }

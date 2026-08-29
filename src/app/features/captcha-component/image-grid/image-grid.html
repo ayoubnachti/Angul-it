@@ -1,5 +1,5 @@
 <fieldset class="image-grid">
-  <legend>Select all {{ imageGridContent().targetLabel }}</legend>
+  <legend>Select all {{ imageGridContent().targetLabel }}s</legend>
 
   @for (image of imageGridContent().images; track image.id) {
     <label class="image-cell">
@@ -15,5 +15,5 @@
 </fieldset>
 
 @if (!isReadonly()) {
-  <button (click)="onSubmit()">Submit</button>
+  <button class="btn-submit" (click)="onSubmit()">Submit</button>
 }
