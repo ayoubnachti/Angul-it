@@ -1,33 +1,61 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal } from '@angular/core';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import { generateImageGridContent, ImageGridContent } from './image-grid-generator';
 
 @Component({
   selector: 'app-image-grid',
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './image-grid.html',
   styleUrl: './image-grid.css',
 })
 export class ImageGrid {
   existingContent = input<ImageGridContent>();
   result = output<{ passed: boolean; content: ImageGridContent }>();
+  hasSubmitted = signal<boolean>(false);
 
   imageGridContent = computed(() => this.existingContent() ?? generateImageGridContent());
-  selectedIds = signal<Set<string>>(new Set());
+  isReadOnly = computed(() => !!this.existingContent());
 
-  isReadonly = computed(() => !!this.existingContent());
+  imageGridForm = new FormGroup({});
 
-  toggleSelection(id: string) {
-    const next = new Set(this.selectedIds());
-    next.has(id) ? next.delete(id) : next.add(id);
-    this.selectedIds.set(next);
+  constructor() {
+    effect(() => {
+      const content = this.imageGridContent(); // reactive — runs once content is real
+      const controls: Record<string, FormControl<boolean>> = {};
+
+      for (const image of content.images) {
+        controls[image.id] = new FormControl(
+          { value: image.isTarget && this.isReadOnly(), disabled: this.isReadOnly() },
+          { nonNullable: true }
+        );
+      }
+
+      this.imageGridForm = new FormGroup(controls, { validators: this.exactMatchValidator() });
+    }, { allowSignalWrites: true });
+  }
+
+  private exactMatchValidator(): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const content = this.imageGridContent();
+      const formGroup = group as FormGroup;
+      const allMatch = content.images.every(
+        (image) => !!formGroup.controls[image.id]?.value === image.isTarget
+      );
+      return allMatch ? null : { mismatch: true };
+    };
   }
 
   onSubmit() {
-    const content = this.imageGridContent();
-    const targetIds = new Set(content.images.filter((i) => i.isTarget).map((i) => i.id));
-    const setsAreEqual = (a: any, b: any) => a.size === b.size && a.isSubsetOf(b);
-    const passed = setsAreEqual(targetIds, this.selectedIds());
-
-    this.result.emit({ passed, content });
+    this.imageGridForm.markAllAsTouched();
+    const passed = this.imageGridForm.valid;
+    this.hasSubmitted.set(true)
+    this.result.emit({ passed, content: this.imageGridContent() });
   }
 }

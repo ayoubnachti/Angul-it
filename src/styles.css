@@ -76,3 +76,10 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.field-error {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-error) !important;
+  margin: 8px 0 !important;
+}

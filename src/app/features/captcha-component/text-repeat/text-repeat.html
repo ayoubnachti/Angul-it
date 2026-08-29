@@ -1,15 +1,15 @@
 <p>Try to retype this:</p>
 <p class="text-to-repeat">{{ textRepeatContent().challengeText }}</p>
 
-<label for="repeat-input">Your answer</label>
-<input
-  id="repeat-input"
-  type="text"
-  [disabled]="isReadOnly()"
-  (input)="onTyping($event)"
-  [value]="isReadOnly() ? textRepeatContent().challengeText : textTyped()"
-/>
+<form [formGroup]="textRepeatForm" (ngSubmit)="onSubmit()">
+  <label for="repeat-input">Your answer</label>
+  <input id="repeat-input" type="text" formControlName="answer" />
 
-@if (!isReadOnly()) {
-  <button class="btn-submit" (click)="onSubmit()">Submit</button>
-}
+  @if (textRepeatForm.controls.answer.invalid && textRepeatForm.controls.answer.touched) {
+    <p class="field-error">Doesn't match — check the characters and try again.</p>
+  }
+
+  @if (!isReadOnly()) {
+    <button class="btn-submit" type="submit">Submit</button>
+  }
+</form>

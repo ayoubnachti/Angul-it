@@ -1,9 +1,18 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output } from '@angular/core';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { generateTextRepeatContent, TextRepeatContent } from './text-repeat-generator';
 
 @Component({
   selector: 'app-text-repeat',
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './text-repeat.html',
   styleUrl: './text-repeat.css',
 })
@@ -12,18 +21,35 @@ export class TextRepeat {
   result = output<{ passed: boolean; content: TextRepeatContent }>();
 
   textRepeatContent = computed(() => this.existingContent() ?? generateTextRepeatContent());
-  textTyped = signal<string>('');
-
   isReadOnly = computed(() => !!this.existingContent());
 
-  onTyping(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.textTyped.set(input.value);
+  textRepeatForm = new FormGroup({
+    answer: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, this.matchesChallengeValidator()],
+    }),
+  });
+
+  constructor() {
+    effect(() => {
+      const content = this.existingContent();
+      if (content) {
+        this.textRepeatForm.patchValue({ answer: content.challengeText });
+        this.textRepeatForm.disable();
+      }
+    });
+  }
+
+  private matchesChallengeValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const content = this.textRepeatContent();
+      return control.value === content.challengeText ? null : { mismatch: true };
+    };
   }
 
   onSubmit() {
-    const content = this.textRepeatContent();
-    const passed = this.textTyped() === content.challengeText;
-    this.result.emit({ passed, content });
+    this.textRepeatForm.markAllAsTouched();
+    const passed = this.textRepeatForm.valid;
+    this.result.emit({ passed, content: this.textRepeatContent() });
   }
 }

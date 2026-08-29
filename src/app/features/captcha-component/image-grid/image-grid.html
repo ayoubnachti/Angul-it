@@ -1,19 +1,20 @@
-<fieldset class="image-grid">
-  <legend>Select all {{ imageGridContent().targetLabel }}s</legend>
+<form [formGroup]="imageGridForm" (ngSubmit)="onSubmit()">
+  <fieldset class="image-grid">
+    <legend>Select all {{ imageGridContent().targetLabel }}s</legend>
 
-  @for (image of imageGridContent().images; track image.id) {
-    <label class="image-cell">
-      <input
-        type="checkbox"
-        [checked]="isReadonly() ? image.isTarget : selectedIds().has(image.id)"
-        [disabled]="isReadonly()"
-        (change)="toggleSelection(image.id)"
-      />
-      <img [src]="image.src" alt="" />
-    </label>
+    @for (image of imageGridContent().images; track image.id) {
+      <label class="image-cell">
+        <input type="checkbox" [formControlName]="image.id" />
+        <img [src]="image.src" alt="" />
+      </label>
+    }
+  </fieldset>
+
+  @if (imageGridForm.invalid && hasSubmitted()) {
+    <p class="field-error">Not quite — try again.</p>
   }
-</fieldset>
 
-@if (!isReadonly()) {
-  <button class="btn-submit" (click)="onSubmit()">Submit</button>
-}
+  @if (!isReadOnly()) {
+    <button class="btn-submit" type="submit">Submit</button>
+  }
+</form>

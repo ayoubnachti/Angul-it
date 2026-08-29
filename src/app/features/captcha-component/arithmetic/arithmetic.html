@@ -1,21 +1,19 @@
 <p>Can you solve this:</p>
 
-<label>Your answer: </label>
+<form [formGroup]="arithmeticForm" (ngSubmit)="onSubmit()">
+  <div class="arithmetic-inline">
+    <span>{{ arithmeticContent().operandA }}</span>
+    <span>{{ arithmeticContent().operator }}</span>
+    <span>{{ arithmeticContent().operandB }}</span>
+    <span>=</span>
+    <input type="number" aria-label="Your answer" formControlName="answer" />
+  </div>
 
-<div class="arithmetic-inline">
-  <span>{{ arithmeticContent().operandA }}</span>
-  <span>{{ arithmeticContent().operator }}</span>
-  <span>{{ arithmeticContent().operandB }}</span>
-  <span>=</span>
-  <input
-    type="number"
-    aria-label="Your answer"
-    [disabled]="isReadOnly()"
-    (input)="onInput($event)"
-    [value]="isReadOnly() ? arithmeticContent().answer : userAnswer()"
-  />
-</div>
+  @if (arithmeticForm.controls.answer.invalid && arithmeticForm.controls.answer.touched) {
+    <p class="field-error">Not quite — try again.</p>
+  }
 
-@if (!isReadOnly()) {
-  <button class="btn-submit" (click)="onSubmit()">Submit</button>
-}
+  @if (!isReadOnly()) {
+    <button class="btn-submit" type="submit">Submit</button>
+  }
+</form>

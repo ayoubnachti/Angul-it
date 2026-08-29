@@ -21,7 +21,7 @@ export class CaptchaComponent {
     if (!this.captchaState.hasStoredProgress()) {
       this.captchaState.initStages(['image-grid', 'text-repeat', 'arithmetic']);
     }
-    
+
     this.captchaState.startSessionTimer();
 
     effect(() => {
@@ -55,8 +55,6 @@ export class CaptchaComponent {
   }
 
   onChallengeResult(event: { passed: boolean; content: StageContent }) {
-    this.showError.set(!event.passed);
-
     if (!event.passed) {
       this.captchaState.recordAttempt();
       return;
